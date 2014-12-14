@@ -5,6 +5,7 @@
  */
 var color = "white";
 var backgroundColor = "black";
+var serverUrl = "http://pomodoro.abelozerov.com";
 
 console.log("Hello it's Pomodoro Pebble");
 console.log("Date: " + (new Date().getTime() / 1000));
@@ -105,7 +106,7 @@ window.on('click', 'down', function(e) {
 setInterval(function() {
   ajax(
   {
-    url: 'http://pomodoro.abelozerov.com/timer',
+    url: serverUrl + '/timer',
     type: 'json'
   },
   function(data) {
@@ -120,12 +121,9 @@ setInterval(function() {
 }, 200);
 
 function sendTimerMessage(message) {
-  //$.post("timer/" + message, function(data, txtStatus, xhr) {
-  //  onTimerStateReceived(data);
-  //})
   ajax(
   {
-    url: 'http://pomodoro.abelozerov.com/timer/' + message,
+    url: serverUrl + '/timer/' + message,
     method: "POST",
     type: 'json'
   },
@@ -149,11 +147,9 @@ function onTimerStateReceived(timerState) {
   var interval = 0;
   if (timerState.type == 'work') {
     interval = constants.workIntervalLength;
-    //$(".pb-app").removeClass("pb-app-state-rest");
     pomodoroNumberText.text("Pomodoro #" + timerState.pomodoroCounter);
   } else if (timerState.type == "rest") {
     interval = constants.restIntervalLength;
-    //$(".pb-app").addClass("pb-app-state-rest");
     pomodoroNumberText.text("Take a rest");
   }
   var minutes = Math.floor(interval / 60);
@@ -211,10 +207,7 @@ function _renderInProgressView() {
     pauseButton.image('images/icon-pause.png');
     pauseButton.size(new Vector2(10, 10));
   }
-  currentView = "in progress"; 
-  //$(".pb-btn-start").hide();
-  //$(".pb-btn-pause").show();
-  //$(".pb-btn-stop").show();
+  currentView = "in progress";
 }
 
 function _renderPausedView() {
@@ -223,9 +216,6 @@ function _renderPausedView() {
     pauseButton.size(new Vector2(7, 13));
   }
   currentView = "paused";
-  //$(".pb-btn-start").show();
-  //$(".pb-btn-pause").hide();
-  //$(".pb-btn-stop").show();
 }
 
 function _renderStoppedView() {
@@ -234,7 +224,4 @@ function _renderStoppedView() {
     pauseButton.size(new Vector2(7, 13));
   }
   currentView = "stopped";
-  //$(".pb-btn-start").show();
-  //$(".pb-btn-pause").hide();
-  //$(".pb-btn-stop").hide();
 }
