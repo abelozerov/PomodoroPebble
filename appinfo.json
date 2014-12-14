@@ -28,6 +28,21 @@
                 "file": "fonts/UbuntuMono-Regular.ttf",
                 "name": "MONO_FONT_14",
                 "type": "font"
+            },
+            {
+                "file": "images/icon-stop.png",
+                "name": "IMAGES_ICON_STOP_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/icon-play.png",
+                "name": "IMAGES_ICON_PLAY_PNG",
+                "type": "png"
+            },
+            {
+                "file": "images/icon-pause.png",
+                "name": "IMAGES_ICON_PAUSE_PNG",
+                "type": "png"
             }
         ]
     },

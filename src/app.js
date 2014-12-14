@@ -3,12 +3,16 @@
  *
  * This is where you write your app.
  */
+var color = "white";
+var backgroundColor = "black";
+
 console.log("Hello it's Pomodoro Pebble");
 console.log("Date: " + (new Date().getTime() / 1000));
 
 var UI = require('ui');
 var Vector2 = require('vector2');
 var ajax = require('ajax');
+var Vibe = require('ui/vibe');
 
 var constants = {
   workIntervalLength: 1500/60, // seconds,
@@ -21,44 +25,64 @@ window.fullscreen(true);
 
 // Create TimeText
 var timeText = new UI.TimeText({
-  position: new Vector2(0, 20),
-  size: new Vector2(124, 50),
+  position: new Vector2(10, 26),
+  size: new Vector2(124, 42),
   text: "%H:%M",
-  font: 'bitham-42-light',
-  color: 'white',
-  textAlign: 'center'
+  font: 'bitham-42-medium-numbers',//'bitham-42-medium-numbers',
+  color: color,
+  textAlign: 'left'
 });
 window.add(timeText);
 
 // Create a background Rect
-var bgRect = new UI.Rect({
+/*var bgRect = new UI.Rect({
   position: new Vector2(10, 95),
   size: new Vector2(104, 60),
   backgroundColor: 'white'
 });
 
 // Add Rect to Window
-window.add(bgRect);
+window.add(bgRect);*/
 
 // Create Pomodoro #
 var pomodoroNumberText = new UI.Text({
-  position: new Vector2(0, 100),
-  size: new Vector2(124, 20),
+  position: new Vector2(10, 90),
+  size: new Vector2(124, 18),
   text: "Pomodoro #1",
-  font: 'gothic-14-bold',
-  color: 'black',
-  textAlign: 'center'
+  font: 'gothic-18-bold',
+  color: color,
+  textAlign: 'left'
 });
 var pomodoroTimeText = new UI.Text({
-  position: new Vector2(0, 115),
-  size: new Vector2(124, 25),
+  position: new Vector2(10, 110),
+  size: new Vector2(124, 21),
   text: "25:00",
-  font: 'gothic-28-bold',
-  color: 'black',
-  textAlign: 'center'
+  font: 'roboto-condensed-21',
+  color: color,
+  textAlign: 'left'
 });
 window.add(pomodoroNumberText);
 window.add(pomodoroTimeText);
+
+// Side buttons UI
+var pauseButton = new UI.Image({
+  position: new Vector2(129, 33),
+  size: new Vector2(10, 10),
+  image: 'images/icon-play.png'
+});
+window.add(pauseButton);
+/*var playButton = new UI.Image({
+  position: new Vector2(131, 78),
+  size: new Vector2(7, 13),
+  image: 'images/icon-play.png'
+});
+window.add(playButton);*/
+var stopButton = new UI.Image({
+  position: new Vector2(129, 125),
+  size: new Vector2(10, 10),
+  image: 'images/icon-stop.png'
+});
+window.add(stopButton);
 
 // Show the Window
 window.show();
@@ -114,7 +138,13 @@ function sendTimerMessage(message) {
   });
 }
 
+var prevTimerState = null;
 function onTimerStateReceived(timerState) {
+  
+  if(prevTimerState && prevTimerState.type != timerState.type) {
+    // Trigger a vibration
+    Vibe.vibrate('short');
+  }
 
   var interval = 0;
   if (timerState.type == 'work') {
@@ -167,9 +197,8 @@ function onTimerStateReceived(timerState) {
       minutes = seconds = 0;
   }
   
-  pomodoroTimeText.text(minutes + ":" + seconds);
-  //$(".pb-clock-minutes").text(minutes);
-  //$(".pb-clock-seconds").text(seconds);
+  pomodoroTimeText.text((minutes < 10? "0" : "") + minutes + ":" + (seconds < 10? "0" : "") + seconds);
+  prevTimerState = timerState;
 }
 
 function _getCurrentTimestamp() {
@@ -178,13 +207,21 @@ function _getCurrentTimestamp() {
 
 var currentView = "";
 function _renderInProgressView() {
-  currentView = "in progress";
+  if(currentView != "in progress") {
+    pauseButton.image('images/icon-pause.png');
+    pauseButton.size(new Vector2(10, 10));
+  }
+  currentView = "in progress"; 
   //$(".pb-btn-start").hide();
   //$(".pb-btn-pause").show();
   //$(".pb-btn-stop").show();
 }
 
 function _renderPausedView() {
+  if(currentView != "paused") {
+    pauseButton.image('images/icon-play.png');
+    pauseButton.size(new Vector2(7, 13));
+  }
   currentView = "paused";
   //$(".pb-btn-start").show();
   //$(".pb-btn-pause").hide();
@@ -192,6 +229,10 @@ function _renderPausedView() {
 }
 
 function _renderStoppedView() {
+  if(currentView != "stopped") {
+    pauseButton.image('images/icon-play.png');
+    pauseButton.size(new Vector2(7, 13));
+  }
   currentView = "stopped";
   //$(".pb-btn-start").show();
   //$(".pb-btn-pause").hide();
